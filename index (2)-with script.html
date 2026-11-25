@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Update your address | Joey and Meghan White</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --ink: #1d2b24;
+    --green: #1f4e3d;
+    --green-soft: #e6eee9;
+    --red: #a8322d;
+    --paper: #fbf8f2;
+    --line: #d9d2c3;
+    --muted: #6b6f68;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 32px 20px 56px; }
+  header { border-bottom: 2px solid var(--green); padding-bottom: 18px; margin-bottom: 26px; }
+  .eyebrow { color: var(--red); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: normal; font-size: 32px; line-height: 1.15; margin: 6px 0 10px; color: var(--green); }
+  header p { margin: 0; color: var(--muted); }
+  label { display: block; font-weight: 600; font-size: 14px; margin: 18px 0 6px; }
+  .hint { font-weight: normal; color: var(--muted); }
+  input, textarea, select {
+    width: 100%; padding: 12px 12px; font: inherit; color: var(--ink);
+    background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; border-color: var(--green); }
+  textarea { min-height: 92px; resize: vertical; }
+  .row { display: grid; column-gap: 12px; row-gap: 0; grid-template-columns: 1fr; }
+  @media (min-width: 480px) { .row.three { grid-template-columns: 2fr 1fr 1.2fr; } .row.two { grid-template-columns: 2fr 1fr; } }
+  .row label { margin-top: 18px; }
+  .linkish { background: none; border: 0; padding: 0; margin-top: 10px; color: var(--green); text-decoration: underline; font: inherit; font-size: 14px; cursor: pointer; }
+  .hidden { display: none; }
+  .hp { position: absolute; left: -5000px; width: 1px; height: 1px; overflow: hidden; }
+  button.submit {
+    margin-top: 28px; width: 100%; padding: 14px; font: inherit; font-weight: 600; font-size: 17px;
+    color: #fff; background: var(--green); border: 0; border-radius: 8px; cursor: pointer;
+  }
+  button.submit:disabled { opacity: .6; cursor: wait; }
+  .error { color: var(--red); font-size: 14px; margin-top: 12px; min-height: 1em; }
+  .thanks { text-align: center; padding: 40px 0; }
+  .thanks h2 { font-family: Georgia, serif; font-weight: normal; color: var(--green); font-size: 28px; margin: 0 0 8px; }
+  footer { margin-top: 28px; font-size: 13px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Christmas card list</div>
+    <h1>Help us keep your address current</h1>
+    <p>Takes a minute. Fill in what you'd like us to have, and leave the rest blank.</p>
+  </header>
+
+  <form id="f" novalidate>
+    <label for="name">Your name(s) <span class="hint">as you'd like them on an envelope</span></label>
+    <input id="name" name="name" autocomplete="name" placeholder="e.g. Katie and Ben Smith" required>
+
+    <label for="address1">Street address</label>
+    <input id="address1" name="address1" autocomplete="address-line1">
+
+    <label for="address2">Apt, suite or unit <span class="hint">(optional)</span></label>
+    <input id="address2" name="address2" autocomplete="address-line2">
+
+    <div class="row three">
+      <div><label for="city">City</label><input id="city" name="city" autocomplete="address-level2"></div>
+      <div><label for="state">State</label><input id="state" name="state" autocomplete="address-level1" maxlength="30"></div>
+      <div><label for="zip">ZIP</label><input id="zip" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="12"></div>
+    </div>
+    <button type="button" class="linkish" id="intlToggle">Outside the US?</button>
+    <div id="intl" class="hidden">
+      <label for="country">Country</label>
+      <input id="country" name="country" autocomplete="country-name">
+    </div>
+
+    <label for="emails">Email <span class="hint">(add a second one with a comma)</span></label>
+    <input id="emails" name="emails" type="text" inputmode="email" autocomplete="email">
+
+    <label for="phones">Mobile number <span class="hint">(add a second one with a comma)</span></label>
+    <input id="phones" name="phones" type="text" inputmode="tel" autocomplete="tel">
+
+    <label for="notes">Anything new? <span class="hint">New baby, new last name, birthdays, anything you want us to know</span></label>
+    <textarea id="notes" name="notes"></textarea>
+
+    <div class="hp" aria-hidden="true">
+      <label for="website">Leave this empty</label>
+      <input id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <button class="submit" id="go" type="submit">Send to Joey and Meghan</button>
+    <div class="error" id="err" role="alert"></div>
+  </form>
+
+  <div id="done" class="thanks hidden">
+    <h2>Thank you!</h2>
+    <p>Got it. Merry Christmas from the Whites.</p>
+  </div>
+
+  <footer>Only Joey and Meghan White see what you send here.</footer>
+</div>
+
+<script>
+  // Paste the Apps Script web app URL here (Deploy > New deployment > Web app).
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzi0sKtboNnT1btXk9IJGVYZYdgJZff-hFllDi030WfbdSBXtZbIfoKWFfhXScOPU9u/exec';
+
+  const form = document.getElementById('f');
+  const err = document.getElementById('err');
+  document.getElementById('intlToggle').addEventListener('click', () => {
+    document.getElementById('intl').classList.toggle('hidden');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    const data = Object.fromEntries(new FormData(form).entries());
+    Object.keys(data).forEach(k => { data[k] = String(data[k]).trim(); });
+    if (!data.name) { err.textContent = 'Please add your name.'; return; }
+    if (!data.address1 && !data.emails && !data.phones && !data.notes) {
+      err.textContent = 'Add an address, email or phone so there is something to update.'; return;
+    }
+    if (data.address1 && (!data.city || !(data.zip || data.country))) {
+      err.textContent = 'Please include the city and ZIP with your street address.'; return;
+    }
+    const btn = document.getElementById('go');
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try {
+      // text/plain avoids a CORS preflight, which Apps Script does not answer.
+      await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
+      form.classList.add('hidden');
+      document.getElementById('done').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    } catch (x) {
+      err.textContent = 'Something went wrong. Please try again, or text Joey.';
+      btn.disabled = false; btn.textContent = 'Send to Joey and Meghan';
+    }
+  });
+</script>
+</body>
+</html>
